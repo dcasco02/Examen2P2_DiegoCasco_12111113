@@ -5,13 +5,14 @@
  */
 package examen2p2_diegocasco;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author dcasc
  */
-public class Canciones {
+public class Canciones implements Serializable{
     private String nombre;
     private String categoria;
     ArrayList <Character> cancion = new ArrayList();

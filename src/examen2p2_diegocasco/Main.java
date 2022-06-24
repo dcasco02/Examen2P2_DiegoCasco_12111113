@@ -156,21 +156,24 @@ public class Main extends javax.swing.JFrame {
         DefaultMutableTreeNode nodo_cancion;
         nodo_categoria=new DefaultMutableTreeNode(
         Categoria);
+        Canciones c=new Canciones(Cancion, Categoria);
+        song.add(c);
         nodo_cancion=new DefaultMutableTreeNode(
         new Canciones(Cancion, Categoria));
         String cancion=TA_Cancion.getText();
         for(int i=0;i<cancion.length();i++){
-            char c=cancion.charAt(i);
-            song.get(song.size()-1).getCancion().add(c);
+            char ca=cancion.charAt(i);
+            song.get(song.size()-1).getCancion().add(ca);
         }
         raiz.add(nodo_categoria);
         nodo_categoria.add(nodo_cancion);
-        m.reload();
-        Canciones c=new Canciones(Cancion, Categoria);
+        m.reload(); 
         ac.cargarArchivo();
         ac.setCanciones(c);
         ac.escribirArchivo();
         TA_Cancion.setEditable(false);
+        TA_Cancion.setText("");
+        System.out.println(song.get(song.size()-1).getCancion());
     }//GEN-LAST:event_Jb_GuardarCancionMouseClicked
 
     private void Jb_GrabarCancionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Jb_GrabarCancionActionPerformed
