@@ -6,22 +6,55 @@
 package examen2p2_diegocasco;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 
 /**
  *
  * @author dcasc
  */
-public class Main extends javax.swing.JFrame {
-
+public class Main extends javax.swing.JFrame implements Runnable {
+    AdminCanciones ac=new AdminCanciones("./canciones.tpm");
+    Canciones cancion;
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
         TA_Cancion.setEditable(false);
+        ac.cargarArchivo();
+        song = ac.getCanciones();
+        cargararbol();
+    }
+    
+    private JProgressBar barra;
+    private boolean avanzar = true;
+    Thread hilo = new Thread(this);
+
+    @Override
+    public void run(){
+        while (avanzar) {
+            if (avanzar) {
+                for(int i=0;i<cancion.getCancion().size();i++){
+                    try {
+                        TA_Cancion.append(cancion.getCancion().get(i).toString());
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } //FIN IF
+
+            try {
+                Thread.sleep(0);
+            }catch (InterruptedException ex) {
+            }
+        }
     }
 
     /**
@@ -70,6 +103,11 @@ public class Main extends javax.swing.JFrame {
         });
 
         JB_ReproducirCancion.setText("Reproducir Cancion");
+        JB_ReproducirCancion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JB_ReproducirCancionActionPerformed(evt);
+            }
+        });
 
         JB_PausarCancion.setText("Pausar Cancion");
 
@@ -146,36 +184,42 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Jb_GuardarCancionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Jb_GuardarCancionMouseClicked
-        // TODO add your handling code here:
-        AdminCanciones ac=new AdminCanciones("./canciones.tpm");
-        DefaultTreeModel m= (DefaultTreeModel) Jt_canciones.getModel();
-        DefaultMutableTreeNode raiz= (DefaultMutableTreeNode) m.getRoot();
+        // TODO add your handling code here:    
         String Categoria =JOptionPane.showInputDialog("Ingrese La categoria");
         String Cancion =JOptionPane.showInputDialog("Ingrese el nombre de la cancion");
-        DefaultMutableTreeNode nodo_categoria;
-        DefaultMutableTreeNode nodo_cancion;
-        nodo_categoria=new DefaultMutableTreeNode(
-        Categoria);
-        Canciones c=new Canciones(Cancion, Categoria);
+        Canciones c =new Canciones(Cancion, Categoria);
         song.add(c);
-        nodo_cancion=new DefaultMutableTreeNode(
-        new Canciones(Cancion, Categoria));
         String cancion=TA_Cancion.getText();
         for(int i=0;i<cancion.length();i++){
             char ca=cancion.charAt(i);
             song.get(song.size()-1).getCancion().add(ca);
-        }
-        raiz.add(nodo_categoria);
-        nodo_categoria.add(nodo_cancion);
-        m.reload(); 
+        } 
         ac.cargarArchivo();
         ac.setCanciones(c);
         ac.escribirArchivo();
         TA_Cancion.setEditable(false);
         TA_Cancion.setText("");
-        System.out.println(song.get(song.size()-1).getCancion());
+        cargararbol();
     }//GEN-LAST:event_Jb_GuardarCancionMouseClicked
 
+    private void cargararbol(){
+        DefaultTreeModel m= (DefaultTreeModel) Jt_canciones.getModel();
+        DefaultMutableTreeNode raiz= (DefaultMutableTreeNode) m.getRoot();
+        raiz.removeAllChildren();
+        for (Canciones canciones : song) {
+            DefaultMutableTreeNode nodo_categoria = null;  
+            for(int i=0;i<raiz.getChildCount();i++)
+               if(raiz.getChildAt(i).toString().equals(canciones.getCategoria()))
+                    nodo_categoria = (DefaultMutableTreeNode)raiz.getChildAt(i);
+                
+            if(nodo_categoria == null){
+                nodo_categoria = new DefaultMutableTreeNode(canciones.getCategoria());
+                raiz.add(nodo_categoria);
+            }
+            nodo_categoria.add(new DefaultMutableTreeNode(canciones));
+        }
+        m.reload();
+    }
     private void Jb_GrabarCancionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Jb_GrabarCancionActionPerformed
         // TODO add your handling code here:
         for(int i=3;i>=0;i--){
@@ -184,6 +228,13 @@ public class Main extends javax.swing.JFrame {
         JLb_Reproducir.setText("Grabando......");
         TA_Cancion.setEditable(true);
     }//GEN-LAST:event_Jb_GrabarCancionActionPerformed
+
+    private void JB_ReproducirCancionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JB_ReproducirCancionActionPerformed
+        // TODO add your handling code here:
+        DefaultMutableTreeNode nodo= (DefaultMutableTreeNode)Jt_canciones.getLastSelectedPathComponent();
+        cancion= (Canciones)nodo.getUserObject();
+        hilo.start();
+    }//GEN-LAST:event_JB_ReproducirCancionActionPerformed
 
     /**
      * @param args the command line arguments
