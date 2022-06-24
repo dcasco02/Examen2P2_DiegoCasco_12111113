@@ -20,28 +20,39 @@ import javax.swing.tree.MutableTreeNode;
  */
 public class Main extends javax.swing.JFrame implements Runnable {
     AdminCanciones ac=new AdminCanciones("./canciones.tpm");
-    Canciones cancion;
+    Canciones cancion = null;
     /**
      * Creates new form Main
      */
-    public Main() {
-        initComponents();
-        TA_Cancion.setEditable(false);
-        ac.cargarArchivo();
-        song = ac.getCanciones();
-        cargararbol();
-    }
     
     private JProgressBar barra;
     private boolean avanzar = true;
     Thread hilo = new Thread(this);
+    
+    public Main() {
+        initComponents();
+        
+        TA_Cancion.setEditable(false);
+        ac.cargarArchivo();
+        song = ac.getCanciones();
+        cargararbol();
+        PB_cancion.setMaximum(122-50);
+        hilo.start();
+    }
+    
+    
 
     @Override
     public void run(){
         while (avanzar) {
-            if (avanzar) {
+            
+                  PB_cancion.setValue(PB_cancion.getValue()-1);
+                System.out.println(PB_cancion.getValue());
+            
+            if (cancion != null) {
                 for(int i=0;i<cancion.getCancion().size();i++){
                     try {
+                        JLb_Reproducir.setText("Reproduciendo : "+cancion.getNombre());
                         TA_Cancion.append(cancion.getCancion().get(i).toString());
                         Thread.sleep(100);
                     } catch (InterruptedException ex) {
@@ -51,7 +62,7 @@ public class Main extends javax.swing.JFrame implements Runnable {
             } //FIN IF
 
             try {
-                Thread.sleep(0);
+                Thread.sleep(100);
             }catch (InterruptedException ex) {
             }
         }
@@ -86,6 +97,11 @@ public class Main extends javax.swing.JFrame implements Runnable {
 
         TA_Cancion.setColumns(20);
         TA_Cancion.setRows(5);
+        TA_Cancion.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                TA_CancionKeyPressed(evt);
+            }
+        });
         jScrollPane2.setViewportView(TA_Cancion);
 
         Jb_GrabarCancion.setText("Grabar Cancion");
@@ -235,6 +251,15 @@ public class Main extends javax.swing.JFrame implements Runnable {
         cancion= (Canciones)nodo.getUserObject();
         hilo.start();
     }//GEN-LAST:event_JB_ReproducirCancionActionPerformed
+
+    private void TA_CancionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TA_CancionKeyPressed
+        // TODO add your handling code here:
+        try {
+           int num = ((int)evt.getKeyChar());
+           PB_cancion.setValue(num-50);
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_TA_CancionKeyPressed
 
     /**
      * @param args the command line arguments
