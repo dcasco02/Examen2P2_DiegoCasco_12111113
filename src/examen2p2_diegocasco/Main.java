@@ -5,6 +5,7 @@
  */
 package examen2p2_diegocasco;
 
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -20,6 +21,7 @@ public class Main extends javax.swing.JFrame {
      */
     public Main() {
         initComponents();
+        TA_Cancion.setEditable(false);
     }
 
     /**
@@ -54,6 +56,11 @@ public class Main extends javax.swing.JFrame {
         jScrollPane2.setViewportView(TA_Cancion);
 
         Jb_GrabarCancion.setText("Grabar Cancion");
+        Jb_GrabarCancion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Jb_GrabarCancionActionPerformed(evt);
+            }
+        });
 
         Jb_GuardarCancion.setText("Guardar Cancion");
         Jb_GuardarCancion.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -151,6 +158,11 @@ public class Main extends javax.swing.JFrame {
         Categoria);
         nodo_cancion=new DefaultMutableTreeNode(
         new Canciones(Cancion, Categoria));
+        String cancion=TA_Cancion.getText();
+        for(int i=0;i<cancion.length();i++){
+            char c=cancion.charAt(i);
+            song.get(song.size()-1).getCancion().add(c);
+        }
         raiz.add(nodo_categoria);
         nodo_categoria.add(nodo_cancion);
         m.reload();
@@ -158,7 +170,17 @@ public class Main extends javax.swing.JFrame {
         ac.cargarArchivo();
         ac.setCanciones(c);
         ac.escribirArchivo();
+        TA_Cancion.setEditable(false);
     }//GEN-LAST:event_Jb_GuardarCancionMouseClicked
+
+    private void Jb_GrabarCancionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Jb_GrabarCancionActionPerformed
+        // TODO add your handling code here:
+        for(int i=3;i>=0;i--){
+        JLb_Reproducir.setText("Grabando en........"+i);
+        }
+        JLb_Reproducir.setText("Grabando......");
+        TA_Cancion.setEditable(true);
+    }//GEN-LAST:event_Jb_GrabarCancionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -208,4 +230,5 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
+    ArrayList<Canciones> song = new ArrayList();
 }
